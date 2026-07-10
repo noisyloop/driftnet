@@ -10,6 +10,35 @@ TypeScript page.
 > not a substitute for real packet-level tooling, and they only work against
 > hosts and networks you are permitted to inspect.
 
+## In plain English
+
+Think of driftnet as a **neighborhood-watch logbook for your Wi-Fi**, running
+entirely inside a browser tab.
+
+Every network has devices coming and going — your phone, a laptop, a smart bulb,
+a guest's tablet, maybe something you don't recognize. driftnet quietly takes
+attendance: it spots the devices it can reach, notes what it saw, and remembers
+them between visits. The next time you run it, it compares notes — *Have I seen
+this device before? Is it behaving differently than last time? Did something
+brand-new just show up?*
+
+When something looks off — a device that's never appeared before, one that
+vanished for a week and came back, or one that suddenly has new "doors" (network
+ports) open — driftnet raises a flag and gives it a risk score from calm green
+to alarming red.
+
+The clever part: it does all of this **without installing anything, without
+admin rights, and without a server**. It leans on ordinary features every
+browser already has — the same plumbing behind video calls, image loading, and
+graphics — and repurposes them to peek at the local network. That also means
+it's a lightweight, heuristic tool: it makes educated guesses, not guarantees.
+It's great for keeping an eye on your own network or a lab, but it isn't a
+replacement for professional packet-inspection gear.
+
+**Who's it for?** Security researchers, tinkerers, and anyone curious about
+what's actually on their network — used only on networks you're allowed to
+inspect.
+
 ## How it works
 
 driftnet correlates devices across scans and flags anomalies using three
