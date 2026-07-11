@@ -41,6 +41,8 @@ function probePort(ip: string, port: number, timeoutMs: number): Promise<PortRes
 
     // https on 443/8443, http otherwise — best guess for the scheme.
     const scheme = port === 443 || port === 8443 ? "https" : "http";
+    // IPv6 literals must be bracketed in URLs.
+    const host = ip.includes(":") ? `[${ip}]` : ip;
     // Cache-buster keeps the browser from short-circuiting repeat probes.
     const bust = Math.random().toString(36).slice(2);
 
@@ -53,7 +55,7 @@ function probePort(ip: string, port: number, timeoutMs: number): Promise<PortRes
     window.setTimeout(() => settle(false), timeoutMs);
 
     try {
-      img.src = `${scheme}://${ip}:${port}/driftnet-probe-${bust}.png`;
+      img.src = `${scheme}://${host}:${port}/driftnet-probe-${bust}.png`;
     } catch {
       settle(false);
     }

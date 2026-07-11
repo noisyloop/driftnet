@@ -86,6 +86,9 @@ export function DeviceLedger({ devices, selectedIp, onSelect }: Props) {
                   onClick={() => onSelect(d.ip)}
                 >
                   <td className="mono">
+                    <span className={`fam-badge fam-${d.ipVersion}`}>
+                      v{d.ipVersion}
+                    </span>{" "}
                     {d.ip}
                     <span className="ipclass">{d.ipClass}</span>
                   </td>
