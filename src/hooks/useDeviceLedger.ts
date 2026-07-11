@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { DeviceRecord, DeviceStore, Observation } from "../types";
+import type {
+  DeviceRecord,
+  DeviceStore,
+  EgressBaseline,
+  Observation,
+  SweepFace,
+} from "../types";
 import { RiskEngine } from "../lib/RiskEngine";
 
 export const LEDGER_KEY = "driftnet:devices";
@@ -9,7 +15,12 @@ function loadStore(): DeviceStore {
     const raw = localStorage.getItem(LEDGER_KEY);
     if (!raw) return {};
     const parsed = JSON.parse(raw) as DeviceStore;
-    return parsed && typeof parsed === "object" ? parsed : {};
+    if (!parsed || typeof parsed !== "object") return {};
+    // Migrate records persisted before ipVersion existed (all were IPv4).
+    for (const rec of Object.values(parsed)) {
+      rec.ipVersion ??= 4;
+    }
+    return parsed;
   } catch {
     return {};
   }
@@ -26,7 +37,12 @@ function persist(store: DeviceStore): void {
 export interface LedgerApi {
   devices: DeviceRecord[];
   /** Merge an observation into the ledger, returning the updated record. */
-  record: (obs: Observation, now?: number) => DeviceRecord;
+  record: (
+    obs: Observation,
+    egress?: EgressBaseline | null,
+    sweep?: SweepFace[],
+    now?: number,
+  ) => DeviceRecord;
   /** Wipe the entire ledger. */
   clear: () => void;
   /** Look up a single record. */
@@ -62,14 +78,20 @@ export function useDeviceLedger(): LedgerApi {
   }, [sync]);
 
   const record = useCallback(
-    (obs: Observation, now: number = Date.now()): DeviceRecord => {
+    (
+      obs: Observation,
+      egress: EgressBaseline | null = null,
+      sweep: SweepFace[] = [],
+      now: number = Date.now(),
+    ): DeviceRecord => {
       const store = storeRef.current;
       const prior = store[obs.ip] ?? null;
-      const assessment = RiskEngine.assess(obs, prior, now);
+      const assessment = RiskEngine.assess(obs, prior, egress, sweep, now);
 
       const next: DeviceRecord = {
         ip: obs.ip,
         ipClass: obs.ipClass,
+        ipVersion: obs.ipVersion,
         firstSeen: prior?.firstSeen ?? now,
         lastSeen: now,
         seenCount: (prior?.seenCount ?? 0) + 1,

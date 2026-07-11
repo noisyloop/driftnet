@@ -127,10 +127,11 @@ from "an address I didn't expect," so it errs toward flagging.
 ## Device ledger
 
 Every discovered identity is persisted to `localStorage` under the key
-`driftnet:devices` as a keyed store. Each record holds: `ip`, `ipVersion`
-(`4 | 6`), `firstSeen`, `lastSeen`, `seenCount`, `portProfile` (port + latency
-results), `portSignature`, `fingerprintHash`, `rttMs`, and the computed
-`riskScore` / `riskLevel` / `riskSignals`.
+`driftnet:devices` as a keyed store. Each record holds: `ip`, `ipClass`,
+`ipVersion` (`4 | 6`), `firstSeen`, `lastSeen`, `seenCount`, `portProfile`
+(port + latency results), `portSignature`, `fingerprintHash`, `rttMs`, and the
+computed `riskScore` / `riskLevel` / `riskSignals`. Records persisted before
+`ipVersion` existed are migrated on load and treated as IPv4.
 
 ## UI
 
@@ -161,7 +162,7 @@ src/
     ipClass.ts            IPv4 + IPv6 range classification
     format.ts             timestamp / risk formatting helpers
   components/
-    DeviceLedger.tsx  DetailPane.tsx  ScanLog.tsx
+    DeviceLedger.tsx  DetailPane.tsx  ScanLog.tsx  EgressPanel.tsx
   App.tsx  main.tsx  types.ts  styles.css
 ```
 
@@ -172,6 +173,7 @@ npm install
 npm run dev      # vite dev server on :5173
 npm run build    # typecheck + production build
 npm run lint     # tsc --noEmit
+npm test         # vitest — RiskEngine + ipClass unit coverage
 ```
 
 ## Limitations

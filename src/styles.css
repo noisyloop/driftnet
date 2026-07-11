@@ -144,6 +144,58 @@ body {
   color: var(--critical);
 }
 
+/* ---- egress baseline editor ---- */
+
+.egress-panel {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-bright);
+  padding: 8px 14px 10px;
+}
+.egress-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.egress-head .btn-close {
+  margin-left: auto;
+  padding: 1px 8px;
+}
+.egress-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+.egress-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.egress-fields label span {
+  color: var(--fg-dim);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.input {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-bright);
+  background: #080a09;
+  border: 1px solid var(--border-bright);
+  padding: 5px 8px;
+  min-width: 180px;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--accent-dim);
+}
+.input::placeholder {
+  color: var(--fg-dim);
+  opacity: 0.6;
+}
+
 /* ---- three-panel grid ---- */
 
 .grid {
@@ -276,6 +328,29 @@ body {
   font-size: 11px;
 }
 
+/* ---- address-family badges / egress status ---- */
+
+.fam-badge {
+  display: inline-block;
+  padding: 0 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--border-bright);
+  color: var(--fg-dim);
+}
+.fam-6 {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.egress-ok {
+  color: var(--accent);
+}
+.egress-bad {
+  color: var(--critical);
+  font-weight: 700;
+}
+
 /* ---- risk badges / colors ---- */
 
 .risk-badge {
@@ -367,6 +442,12 @@ body {
 .signal-weight {
   color: var(--high);
   font-weight: 700;
+}
+.signal-list li.signal-info .signal-weight {
+  color: var(--accent);
+}
+.signal-list li.signal-critical .signal-weight {
+  color: var(--critical);
 }
 .signal-label {
   color: var(--fg-bright);

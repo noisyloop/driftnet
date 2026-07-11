@@ -1,12 +1,27 @@
-import type { DeviceRecord } from "../types";
+import type { DeviceRecord, EgressBaseline } from "../types";
 import { ipClassLabel } from "../lib/ipClass";
 import { riskClass, stamp, timeAgo } from "../lib/format";
 
 interface Props {
   device: DeviceRecord | null;
+  egress: EgressBaseline | null;
 }
 
-export function DetailPane({ device }: Props) {
+/** Egress-match status for a public-IP device against the baseline. */
+function egressStatus(device: DeviceRecord, egress: EgressBaseline | null) {
+  if (device.ipClass !== "public") return null;
+  const expected =
+    device.ipVersion === 6 ? egress?.expectedIpv6 : egress?.expectedIpv4;
+  if (expected && device.ip === expected) {
+    return <span className="egress-ok">egress confirmed ✓</span>;
+  }
+  if (egress && (egress.expectedIpv4 || egress.expectedIpv6)) {
+    return <span className="egress-bad">unexpected ✗</span>;
+  }
+  return <span className="dim">no baseline set</span>;
+}
+
+export function DetailPane({ device, egress }: Props) {
   return (
     <div className="panel detail">
       <div className="panel-head">
@@ -23,8 +38,26 @@ export function DetailPane({ device }: Props) {
               <dl>
                 <dt>ip</dt>
                 <dd className="mono">{device.ip}</dd>
+                <dt>family</dt>
+                <dd>
+                  <span className={`fam-badge fam-${device.ipVersion}`}>
+                    IPv{device.ipVersion}
+                  </span>
+                </dd>
                 <dt>class</dt>
                 <dd>{ipClassLabel(device.ipClass)}</dd>
+                {device.ipClass === "public" && (
+                  <>
+                    <dt>egress</dt>
+                    <dd>
+                      {egressStatus(device, egress)}
+                      {egress?.label && (
+                        <span className="dim"> · {egress.label}</span>
+                      )}
+                      {egress?.asn && <span className="dim"> · {egress.asn}</span>}
+                    </dd>
+                  </>
+                )}
                 <dt>rtt est.</dt>
                 <dd>{device.rttMs} ms</dd>
                 <dt>observer fp</dt>
@@ -67,7 +100,7 @@ export function DetailPane({ device }: Props) {
               ) : (
                 <ul className="signal-list">
                   {device.riskSignals.map((s) => (
-                    <li key={s.id}>
+                    <li key={s.id} className={s.tier ? `signal-${s.tier}` : ""}>
                       <span className="signal-weight">+{s.weight}</span>
                       <span className="signal-label">{s.label}</span>
                       <span className="signal-detail dim">{s.detail}</span>
